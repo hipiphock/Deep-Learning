@@ -44,7 +44,7 @@ for i in range(n):
 w1 = 0
 w2 = 0
 b = 0
-alpha = 0.0001
+alpha = 0.001
 # Step 2.2. Calculate the cost with m train samples
 print("Initial value for w1: {}, w2: {}, b: {}".format(w1, w2, b))
 loss = 0
@@ -61,7 +61,6 @@ for j in range(n):
             y_hat = 1
         else:
             y_hat = 0
-        # print("Z: {}".format(z))
         dzi = y_hat - y_train[i]
         loss += L(y_hat, y_train[i])
         dw1 += x1_train[i]*dzi
