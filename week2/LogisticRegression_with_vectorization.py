@@ -24,32 +24,40 @@ for i in range(m):
         y_train.append(0)
 
 # generate 100 test
-# alpha = 0.0001
+# with learning rate alpha = 0.0001
 # if y_hat > 0.5 :
 #   set y_hat = 1   # for accuray evaluation
 
 # Step 2. Update w1, w2, b with 1000 samples for 100 iteration: #100 grad updates
-# but it seems you can use zeros for our logistic regression model.
+# You can use zeros for our logistic regression model.
 w1 = 0
 w2 = 0
 b = 0
 alpha = 0.0001
 # Step 2.2. Calculate the cost with m train samples
 print("Initial value for w1: {}, w2: {}, b: {}".format(w1, w2, b))
-for i in range(m):
-    z = w1*x1_train[i] + w2*x2_train[i] + b
-    if sigmoid(z) > 0.5:
-        a = 1
-    else:
-        a = 0
-    print("Z: {}".format(z))
-    L_func = L(a, y_train[i])
-    dw1 = x1_train[i]*(a - y_train[i])
-    dw2 = x2_train[i]*(a - y_train[i])
+loss = 0
+dw1 = 0
+dw2 = 0
+count = 0
+for j in range(n):
+    for i in range(m):
+        z = w1*x1_train[i] + w2*x2_train[i] + b
+        if sigmoid(z) > 0.5:
+            a = 1
+        else:
+            a = 0
+        print("Z: {}".format(z))
+        loss += L(a, y_train[i])
+        dw1 += x1_train[i]*(a - y_train[i])
+        dw2 += x2_train[i]*(a - y_train[i])
+        if a == y_train[i]:
+            count+=1
     w1 = w1 - alpha*dw1
     w2 = w2 - alpha*dw2
     b = b - alpha*(a - y_train[i])
     print("w1: {}, w2: {}, b: {}".format(w1, w2, b))
+    
 
 # Step 2.3. Calculate the cost with n test samples
 # First, create 100 test samples
