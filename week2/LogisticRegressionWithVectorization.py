@@ -38,7 +38,7 @@ def L(a, y):
     return -(y*math.log(a) + (1-y)*math.log(1-a))
 
 # training function
-def train(X, Y):
+def train_vectorized(X, Y):
     global W, b
     batch_dW = np.array([0, 0])
     batch_db = 0
@@ -89,8 +89,8 @@ if __name__ == '__main__':
     train_X, train_Y = generate_random_data(m)
     test_X, test_Y = generate_random_data(n)
     for i in range(m):
-        train(train_X, train_Y)
+        train_vectorized(train_X, train_Y)
         print("Iteration: "+ i.__str__())
         print('w1: {}, w2: {}, b: {}'.format(W[0], W, b))
-        print('train loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
+        print('train_vectorized loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
         print('test loss: {}, accuracy: {}'.format(loss(test_X, test_Y), accuracy(test_X, test_Y)))

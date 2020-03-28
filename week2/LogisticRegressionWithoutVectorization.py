@@ -34,7 +34,7 @@ def L(a, y):
     return -(y*math.log(a) + (1-y)*math.log(1-a))
 
 # training function
-def train(datalist):
+def train_unvectorized(datalist):
     global w1, w2, b
     batch_dw1, batch_dw2, batch_db = 0, 0, 0
     for data in datalist:
@@ -83,8 +83,8 @@ if __name__ == '__main__':
     train_data = generate_random_data(m)
     test_data = generate_random_data(n)
     for i in range(m):
-        train(train_data)
+        train_unvectorized(train_data)
         print("Iteration: "+ i.__str__())
         print('w1: {}, w2: {}, b: {}'.format(w1, w2, b))
-        print('train loss: {}, accuracy: {}'.format(loss(train_data), accuracy(train_data)))
+        print('train_unvectorized loss: {}, accuracy: {}'.format(loss(train_data), accuracy(train_data)))
         print('test loss: {}, accuracy: {}'.format(loss(test_data), accuracy(test_data)))
