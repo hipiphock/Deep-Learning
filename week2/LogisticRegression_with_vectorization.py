@@ -12,85 +12,85 @@ n = 100
 alpha = 0.0001 # learning rate
 loss = 0
 
-w = [0, 0, 0]
+W = np.array([0, 0])
 b = 0
 
 # data generator
 def generate_random_data(size):
-    datalist = []
+    X = []
+    Y = []
     for i in range(size):
-        data = []
         x1 = random.randint(-10, 10)
         x2 = random.randint(-10, 10)
-        data.append(x1)
-        data.append(x2)
-        if data[0] + data[1] > 0:
-            data.append(1)
+        if x1 + x2 > 0:
+            Y.append(1)
         else:
-            data.append(0)
-        datalist.append(data)
-    return datalist
+            Y.append(0)
+        X.append(np.array([x1, x2]))
+    return X, Y
 
 # Sigmoid function
-def sigmoid(x):
-    return 1/(1+math.exp(-x))
+def sigmoid(val):
+    return 1/(1+math.exp(-val))
 
 # Loss function for Logistic Regression
 def L(a, y):
     return -(y*math.log(a) + (1-y)*math.log(1-a))
 
 # training function
-def train(datalist):
-    global w, b
-    batch_dw1, batch_dw2, batch_db = 0, 0, 0
-    for x in datalist:
-        z = np.dot(w, x) + b
+def train(X, Y):
+    global W, b
+    batch_dW = np.array([0, 0])
+    batch_db = 0
+    for i in range(len(X)):
+        z = np.dot(W, X[i]) + b
         a = sigmoid(z)
-        da = -x[2]/a + (1-x[2])/(1-a)
+        da = -Y[i]/a + (1-Y[i])/(1-a)
         dz = da * a * (1-a)
-        dw1 = x[0]*dz
-        dw2 = x[1]*dz
+        dW = X[i]*dz
         db = dz
-        batch_dw1 += dw1 / len(datalist)
-        batch_dw2 += dw2 / len(datalist)
-        batch_db += db / len(datalist)
-    w[0] -= alpha*batch_dw1
-    w[1] -= alpha*batch_dw2
+        # batch_dw1 += dw1 / len(datalist)
+        # batch_dw2 += dw2 / len(datalist)
+        batch_dW = batch_dW + dW/len(X)
+        batch_db += db/len(X)
+    # w1 -= alpha*batch_dw1
+    # w2 -= alpha*batch_dw2
+    W = W - alpha*batch_dW
     b -= alpha*batch_db
 
 
-def forward(x):
-    global w, b
-    z = np.dot(w, x) + b
+def forward(Xi):
+    global W, b
+    z = np.dot(W, Xi) + b
     a = sigmoid(z)
     MIN_VAL = 1e-10
     a = max(a, MIN_VAL)
     a = min(a, 1 - MIN_VAL)
     return a
 
-def loss(datalist):
+def loss(X, Y):
     batch_loss = 0
-    for x in datalist:
-        pred_y = forward(x)
-        batch_loss -= x[2] * math.log(pred_y) + (1 - x[2]) * math.log(1 - pred_y)
-    batch_loss /= len(datalist)
+    for i in range(len(X)):
+        pred_y = forward(X[i])
+        batch_loss -= Y[i] * math.log(pred_y) + (1 - Y[i]) * math.log(1 - pred_y)
+    batch_loss /= len(X)
     return batch_loss
 
-def accuracy(datalist):
+def accuracy(X, Y):
     num_correct = 0
-    for x in datalist:
-        z = z = np.dot(w, x) + b
+    for i in range(len(X)):
+        z = np.dot(W, X[i]) + b
         a = sigmoid(z)
-        if x[2] == round(forward(x)):
+        if Y[i] == round(forward(X[i])):
             num_correct += 1
-    return num_correct/len(datalist)
+    return num_correct/len(X)
 
 if __name__ == '__main__':
-    train_data = generate_random_data(m)
-    test_data = generate_random_data(n)
+    train_X, train_Y = generate_random_data(m)
+    test_X, test_Y = generate_random_data(n)
     for i in range(m):
-        train(train_data)
+        train(train_X, train_Y)
         print("Iteration: "+ i.__str__())
-        print('w1: {}, w2: {}, b: {}'.format(w[0], w[1], b))
-        print('train loss: {}, accuracy: {}'.format(loss(train_data), accuracy(train_data)))
-        print('test loss: {}, accuracy: {}'.format(loss(test_data), accuracy(test_data)))
+        print('w1: {}, w2: {}, b: {}'.format(W[0], W, b))
+        print('train loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
+        print('test loss: {}, accuracy: {}'.format(loss(test_X, test_Y), accuracy(test_X, test_Y)))
