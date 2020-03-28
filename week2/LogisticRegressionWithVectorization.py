@@ -49,15 +49,10 @@ def train_vectorized(X, Y):
         dz = da * a * (1-a)
         dW = X[i]*dz
         db = dz
-        # batch_dw1 += dw1 / len(datalist)
-        # batch_dw2 += dw2 / len(datalist)
         batch_dW = batch_dW + dW/len(X)
         batch_db += db/len(X)
-    # w1 -= alpha*batch_dw1
-    # w2 -= alpha*batch_dw2
     W = W - alpha*batch_dW
     b -= alpha*batch_db
-
 
 def forward(Xi):
     global W, b
@@ -68,7 +63,7 @@ def forward(Xi):
     a = min(a, 1 - MIN_VAL)
     return a
 
-def loss(X, Y):
+def loss_with_vectorization(X, Y):
     batch_loss = 0
     for i in range(len(X)):
         pred_y = forward(X[i])
@@ -76,7 +71,7 @@ def loss(X, Y):
     batch_loss /= len(X)
     return batch_loss
 
-def accuracy(X, Y):
+def accuracy_with_vectorization(X, Y):
     num_correct = 0
     for i in range(len(X)):
         z = np.dot(W, X[i]) + b
@@ -85,12 +80,12 @@ def accuracy(X, Y):
             num_correct += 1
     return num_correct/len(X)
 
-if __name__ == '__main__':
-    train_X, train_Y = generate_random_data(m)
-    test_X, test_Y = generate_random_data(n)
-    for i in range(m):
-        train_vectorized(train_X, train_Y)
-        print("Iteration: "+ i.__str__())
-        print('w1: {}, w2: {}, b: {}'.format(W[0], W, b))
-        print('train_vectorized loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
-        print('test loss: {}, accuracy: {}'.format(loss(test_X, test_Y), accuracy(test_X, test_Y)))
+# if __name__ == '__main__':
+#     train_X, train_Y = generate_random_data(m)
+#     test_X, test_Y = generate_random_data(n)
+#     for i in range(m):
+#         train_vectorized(train_X, train_Y)
+#         print("Iteration: "+ i.__str__())
+#         print('w1: {}, w2: {}, b: {}'.format(W[0], W, b))
+#         print('train_vectorized loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
+#         print('test loss: {}, accuracy: {}'.format(loss(test_X, test_Y), accuracy(test_X, test_Y)))

@@ -52,7 +52,6 @@ def train_unvectorized(datalist):
     w2 -= alpha*batch_dw2
     b -= alpha*batch_db
 
-
 def forward(x1, x2):
     global w1, w2, b
     z = w1 * x1 + w2 * x2 + b
@@ -62,7 +61,7 @@ def forward(x1, x2):
     a = min(a, 1 - MIN_VAL)
     return a
 
-def loss(datalist):
+def loss_without_vectorization(datalist):
     batch_loss = 0
     for data in datalist:
         pred_y = forward(data['x1'], data['x2'])
@@ -70,7 +69,7 @@ def loss(datalist):
     batch_loss /= len(datalist)
     return batch_loss
 
-def accuracy(datalist):
+def accuracy_without_vectorization(datalist):
     num_correct = 0
     for data in datalist:
         z = w1*data['x1'] + w2*data['x2'] + b
@@ -79,12 +78,12 @@ def accuracy(datalist):
             num_correct += 1
     return num_correct/len(datalist)
 
-if __name__ == '__main__':
-    train_data = generate_random_data(m)
-    test_data = generate_random_data(n)
-    for i in range(m):
-        train_unvectorized(train_data)
-        print("Iteration: "+ i.__str__())
-        print('w1: {}, w2: {}, b: {}'.format(w1, w2, b))
-        print('train_unvectorized loss: {}, accuracy: {}'.format(loss(train_data), accuracy(train_data)))
-        print('test loss: {}, accuracy: {}'.format(loss(test_data), accuracy(test_data)))
+# if __name__ == '__main__':
+#     train_data = generate_random_data(m)
+#     test_data = generate_random_data(n)
+#     for i in range(m):
+#         train_unvectorized(train_data)
+#         print("Iteration: "+ i.__str__())
+#         print('w1: {}, w2: {}, b: {}'.format(w1, w2, b))
+#         print('train_unvectorized loss: {}, accuracy: {}'.format(loss(train_data), accuracy(train_data)))
+#         print('test loss: {}, accuracy: {}'.format(loss(test_data), accuracy(test_data)))
