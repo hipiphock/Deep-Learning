@@ -78,6 +78,9 @@ def accuracy_without_vectorization(datalist):
             num_correct += 1
     return num_correct/len(datalist)
 
+def print_unvectorized_w_b():
+    print('w1: {}, w2: {}, b: {}'.format(w1, w2, b))
+
 # if __name__ == '__main__':
 #     train_data = generate_random_data(m)
 #     test_data = generate_random_data(n)

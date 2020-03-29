@@ -35,6 +35,7 @@ def generate_data(size):
 if __name__ == '__main__':
     train_X, train_Y, train_data = generate_data(TRAIN_NUM)
     test_X, test_Y, test_data = generate_data(TEST_NUM)
+    
     print("Logistic Regression Without Vectorizaiton:")
     start = time.time()
     for i in range(TRAIN_NUM):
@@ -42,7 +43,9 @@ if __name__ == '__main__':
     end = time.time()
     print('train_unvectorized loss: {}, accuracy: {}'.format(loss_without_vectorization(train_data), accuracy_without_vectorization(train_data)))
     print('test loss: {}, accuracy: {}'.format(loss_without_vectorization(test_data), accuracy_without_vectorization(test_data)))
+    print_unvectorized_w_b()
     print('Time elapsed: ' + str(end - start) + 's')
+
     print("Logistic Regression With Vectorizaiton:")
     start = time.time()
     for i in range(TRAIN_NUM):
@@ -50,4 +53,5 @@ if __name__ == '__main__':
     end = time.time()
     print('train_vectorized loss: {}, accuracy: {}'.format(loss_with_vectorization(train_X, train_Y), accuracy_with_vectorization(train_X, train_Y)))
     print('test loss: {}, accuracy: {}'.format(loss_with_vectorization(test_X, test_Y), accuracy_with_vectorization(test_X, test_Y)))
+    print_vectorized_w_b()
     print('Time elapsed: ' + str(end - start) + 's')
