@@ -42,28 +42,30 @@ def train_vectorized(X, Y):
     global W, b
     batch_dW = np.array([0, 0])
     batch_db = 0
-    for i in range(len(X)):
-        z = np.dot(W, X[i]) + b
-        a = sigmoid(z)
-        da = -Y[i]/a + (1-Y[i])/(1-a)
-        dz = da * a * (1-a)
-        dW = X[i]*dz
-        db = dz
-        batch_dW = batch_dW + dW/len(X)
-        batch_db += db/len(X)
-    W = W - alpha*batch_dW
-    b -= alpha*batch_db
-    # for Xi, Yi in zip(X, Y):
-    #     z = np.dot(W, Xi) + b
+    # iteration with index
+    # for i in range(len(X)):
+    #     z = np.dot(W, X[i]) + b
     #     a = sigmoid(z)
-    #     da = -Yi/a + (1-Yi)/(1-a)
+    #     da = -Y[i]/a + (1-Y[i])/(1-a)
     #     dz = da * a * (1-a)
-    #     dW = Yi*dz
+    #     dW = X[i]*dz
     #     db = dz
     #     batch_dW = batch_dW + dW/len(X)
     #     batch_db += db/len(X)
     # W = W - alpha*batch_dW
     # b -= alpha*batch_db
+    # iteration using zip - have bug with it
+    for Xi, Yi in zip(X, Y):
+        z = np.dot(W, Xi) + b
+        a = sigmoid(z)
+        da = -Yi/a + (1-Yi)/(1-a)
+        dz = da * a * (1-a)
+        dW = Xi*dz
+        db = dz
+        batch_dW = batch_dW + dW/len(X)
+        batch_db += db/len(X)
+    W = W - alpha*batch_dW
+    b -= alpha*batch_db
 
 def forward(Xi):
     global W, b
