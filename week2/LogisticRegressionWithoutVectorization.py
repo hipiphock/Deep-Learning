@@ -81,12 +81,12 @@ def accuracy_without_vectorization(datalist):
 def print_unvectorized_w_b():
     print('w1: {}, w2: {}, b: {}'.format(w1, w2, b))
 
-# if __name__ == '__main__':
-#     train_data = generate_random_data(m)
-#     test_data = generate_random_data(n)
-#     for i in range(m):
-#         train_unvectorized(train_data)
-#         print("Iteration: "+ i.__str__())
-#         print('w1: {}, w2: {}, b: {}'.format(w1, w2, b))
-#         print('train_unvectorized loss: {}, accuracy: {}'.format(loss(train_data), accuracy(train_data)))
-#         print('test loss: {}, accuracy: {}'.format(loss(test_data), accuracy(test_data)))
+if __name__ == '__main__':
+    train_data = generate_random_data(m)
+    test_data = generate_random_data(n)
+    for i in range(m):
+        train_unvectorized(train_data)
+        # print("Iteration: "+ i.__str__())
+    print('w1: {}, w2: {}, b: {}'.format(w1, w2, b))
+    print('train_unvectorized loss: {}, accuracy: {}'.format(loss_without_vectorization(train_data), accuracy_without_vectorization(train_data)))
+    print('test loss: {}, accuracy: {}'.format(loss_without_vectorization(test_data), accuracy_without_vectorization(test_data)))
