@@ -54,7 +54,6 @@ def train_vectorized(X, Y):
     #     batch_db += db/len(X)
     # W = W - alpha*batch_dW
     # b -= alpha*batch_db
-    # iteration using zip - have bug with it
     for Xi, Yi in zip(X, Y):
         z = np.dot(W, Xi) + b
         a = sigmoid(z)

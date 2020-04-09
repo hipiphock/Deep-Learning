@@ -3,16 +3,19 @@ import random
 import math
 from typing import List, Any
 
+# KEY: just do W[2]a[1] for one hidden layer,
+
 # INITAILIZATION
 MIN_NUMBER = 1e-6
 
 m = 1000
 n = 100
 
-alpha = 0.0001 # learning rate
+alpha = 0.01 # learning rate
 loss = 0
 
-W = np.array([0, 0])
+W1 = np.array([0, 0])
+W2 = 0
 b = 0
 
 # data generator
@@ -39,37 +42,28 @@ def L(a, y):
 
 # training function
 def train_vectorized(X, Y):
-    global W, b
-    batch_dW = np.array([0, 0])
+    global W1, W2, b, m, n
+    batch_dW1 = np.array([0, 0])
+    batch_dW2 = 0
     batch_db = 0
-    # iteration with index
-    # for i in range(len(X)):
-    #     z = np.dot(W, X[i]) + b
-    #     a = sigmoid(z)
-    #     da = -Y[i]/a + (1-Y[i])/(1-a)
-    #     dz = da * a * (1-a)
-    #     dW = X[i]*dz
-    #     db = dz
-    #     batch_dW = batch_dW + dW/len(X)
-    #     batch_db += db/len(X)
-    # W = W - alpha*batch_dW
-    # b -= alpha*batch_db
-    # iteration using zip - have bug with it
     for Xi, Yi in zip(X, Y):
-        z = np.dot(W, Xi) + b
+        z = np.dot(W1, Xi) + b
         a = sigmoid(z)
         da = -Yi/a + (1-Yi)/(1-a)
-        dz = da * a * (1-a)
-        dW = Xi*dz
-        db = dz
-        batch_dW = batch_dW + dW/len(X)
-        batch_db += db/len(X)
-    W = W - alpha*batch_dW
-    b -= alpha*batch_db
+        dz = da * a * (1-a) # == a-Yi
+        dW1 = Xi*dz*W2
+        dW2 = a
+        db = dz*W2
+        batch_dW1 = batch_dW1 + dW1/m
+        batch_dW2 = batch_dW2 + dW2/m
+        batch_db += db/m
+    W1 = W1 - alpha*batch_dW1
+    W2 = W2 - alpha*batch_dW2
+    b = b - alpha*batch_db
 
 def forward(Xi):
-    global W, b
-    z = np.dot(W, Xi) + b
+    global W1, b
+    z = np.dot(W1, Xi) + b
     a = sigmoid(z)
     MIN_VAL = 1e-10
     a = max(a, MIN_VAL)
@@ -87,14 +81,14 @@ def loss_with_vectorization(X, Y):
 def accuracy_with_vectorization(X, Y):
     num_correct = 0
     for i in range(len(X)):
-        z = np.dot(W, X[i]) + b
+        z = np.dot(W1, X[i]) + b
         a = sigmoid(z)
         if Y[i] == round(forward(X[i])):
             num_correct += 1
     return num_correct/len(X)
 
 def print_vectorized_w_b():
-    print('w1: {}, w2: {}, b: {}'.format(W[0], W[1], b))
+    print('w1: {}, w2: {}, b: {}'.format(W1[0], W1[1], b))
 
 if __name__ == '__main__':
     train_X, train_Y = generate_random_data(m)
@@ -102,6 +96,6 @@ if __name__ == '__main__':
     for i in range(m):
         train_vectorized(train_X, train_Y)
         # print("Iteration: "+ i.__str__())
-    print('w1: {}, w2: {}, b: {}'.format(W[0], W[1], b))
+    print('W1_1: {}, W1_2: {}, W2: {}, b: {}'.format(W1[0], W1[1], W2, b))
     print('train_vectorized loss: {}, accuracy: {}'.format(loss_with_vectorization(train_X, train_Y), accuracy_with_vectorization(train_X, train_Y)))
     print('test loss: {}, accuracy: {}'.format(loss_with_vectorization(test_X, test_Y), accuracy_with_vectorization(test_X, test_Y)))
