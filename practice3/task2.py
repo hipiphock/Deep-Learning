@@ -4,19 +4,19 @@ import math
 from typing import List, Any
 
 # KEY: just do W[2]a[1] for one hidden layer,
-
 # INITAILIZATION
 MIN_NUMBER = 1e-6
 
 m = 1000
 n = 100
 
-alpha = 0.01 # learning rate
-loss = 0
+alpha = 0.03    # learning rate
+loss = 0        
 
 W1 = np.array([0, 0])
 W2 = 0
-b = 0
+b1 = 0
+b2 = 0
 
 # data generator
 def generate_random_data(size):
@@ -42,47 +42,73 @@ def L(a, y):
 
 # training function
 def train_vectorized(X, Y):
-    global W1, W2, b, m, n
+    global W1, W2, b1, b2, m, n
     batch_dW1 = np.array([0, 0])
     batch_dW2 = 0
-    batch_db = 0
+    batch_db1 = 0
+    batch_db2 = 0
     for Xi, Yi in zip(X, Y):
-        z = np.dot(W1, Xi) + b
-        a = sigmoid(z)
-        da = -Yi/a + (1-Yi)/(1-a)
-        dz = da * a * (1-a) # == a-Yi
-        dW1 = Xi*dz*W2
-        dW2 = a
-        db = dz*W2
-        batch_dW1 = batch_dW1 + dW1/m
-        batch_dW2 = batch_dW2 + dW2/m
-        batch_db += db/m
+        ### forwarding ###
+        # for layer 1 
+        z1 = np.dot(W1, Xi) + b1
+        a1 = sigmoid(z1)
+        a1 = max(a1, MIN_NUMBER)        # to avoid divide by zero
+        a1 = min(a1, 1- MIN_NUMBER)     # to avoid divide by zero
+        # for layer 2
+        z2 = np.dot(W2, a1) + b2        
+        a2 = sigmoid(z2)
+        a2 = max(a2, MIN_NUMBER)        # to avoid divide by zero
+        a2 = min(a2, 1- MIN_NUMBER)     # to avoid divide by zero
+
+        ### back propagation ###
+        # need to find out dL/dW1, dL/dW2, dL/db1, dL/db2
+        # 1. dL/db2
+        dL_db2 = 1
+        # 2. dL/dW2
+        dL_da2 = -Yi/a2 + (1-Yi)/(1-a2)
+        da2_dz2 = a2*(1-a2)
+        dz2_dW2 = a1
+        dL_dW2 = dL_da2*da2_dz2*dz2_dW2
+        # 3. dL/dW1
+        dz2_da1 = W2
+        da1_dz1 = a1*(1-a1)
+        dz1_dW1 = Xi
+        dL_dW1 = dL_da2*da2_dz2*dz2_da1*da1_dz1*dz1_dW1
+        # 4. dL/db1
+        dz1_db1 = 1
+        dL_db1 = dL_da2*da2_dz2*dz2_da1*da1_dz1*dz1_db1
+
+        batch_dW1 = batch_dW1 + dL_dW1/m
+        batch_dW2 = batch_dW2 + dL_dW2/m
+        batch_db1 = batch_db1 + dL_db1/m
+        batch_db2 = batch_db2 + dL_db2/m
+
     W1 = W1 - alpha*batch_dW1
     W2 = W2 - alpha*batch_dW2
-    b = b - alpha*batch_db
+    b1 = b1 - alpha*batch_db1
+    b2 = b2 - alpha*batch_db2
 
 def forward(Xi):
-    global W1, b
-    z = np.dot(W1, Xi) + b
-    a = sigmoid(z)
-    MIN_VAL = 1e-10
-    a = max(a, MIN_VAL)
-    a = min(a, 1 - MIN_VAL)
-    return a
+    global W1, W2, b1, b2, MIN_NUMBER
+    z1 = np.dot(W1, Xi) + b1
+    a1 = sigmoid(z1)
+    a1 = max(a1, MIN_NUMBER)
+    a1 = min(a1, 1 - MIN_NUMBER)
+    z2 = np.dot(W2, z1) + b2
+    a2 = sigmoid(z2)
+    return a2
 
-def loss_with_vectorization(X, Y):
-    batch_loss = 0
-    for i in range(len(X)):
-        pred_y = forward(X[i])
-        batch_loss -= Y[i] * math.log(pred_y) + (1 - Y[i]) * math.log(1 - pred_y)
-    batch_loss /= len(X)
-    return batch_loss
+# def loss_with_vectorization(X, Y):
+#     batch_loss = 0
+#     for i in range(len(X)):
+#         pred_y = forward(X[i])
+#         batch_loss -= Y[i] * math.log(pred_y) + (1 - Y[i]) * math.log(1 - pred_y)
+#     batch_loss /= len(X)
+#     return batch_loss
 
 def accuracy_with_vectorization(X, Y):
     num_correct = 0
     for i in range(len(X)):
-        z = np.dot(W1, X[i]) + b
-        a = sigmoid(z)
         if Y[i] == round(forward(X[i])):
             num_correct += 1
     return num_correct/len(X)
@@ -96,6 +122,6 @@ if __name__ == '__main__':
     for i in range(m):
         train_vectorized(train_X, train_Y)
         # print("Iteration: "+ i.__str__())
-    print('W1_1: {}, W1_2: {}, W2: {}, b: {}'.format(W1[0], W1[1], W2, b))
-    print('train_vectorized loss: {}, accuracy: {}'.format(loss_with_vectorization(train_X, train_Y), accuracy_with_vectorization(train_X, train_Y)))
-    print('test loss: {}, accuracy: {}'.format(loss_with_vectorization(test_X, test_Y), accuracy_with_vectorization(test_X, test_Y)))
+    print('W1_1: {}, W1_2: {}, W2: {}, b1: {}, b2: {}'.format(W1[0], W1[1], W2, b1, b2))
+    print('train accuracy: {}'.format(accuracy_with_vectorization(train_X, train_Y)))
+    print('test accuracy: {}'.format(accuracy_with_vectorization(test_X, test_Y)))
