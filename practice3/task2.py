@@ -98,14 +98,6 @@ def forward(Xi):
     a2 = sigmoid(z2)
     return a2
 
-# def loss_with_vectorization(X, Y):
-#     batch_loss = 0
-#     for i in range(len(X)):
-#         pred_y = forward(X[i])
-#         batch_loss -= Y[i] * math.log(pred_y) + (1 - Y[i]) * math.log(1 - pred_y)
-#     batch_loss /= len(X)
-#     return batch_loss
-
 def accuracy_with_vectorization(X, Y):
     num_correct = 0
     for i in range(len(X)):

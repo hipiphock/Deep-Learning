@@ -9,7 +9,7 @@ MIN_NUMBER = 1e-6
 m = 1000
 n = 100
 
-alpha = 0.0001 # learning rate
+alpha = 0.002 # learning rate
 loss = 0
 
 W = np.array([0, 0])
@@ -22,7 +22,7 @@ def generate_random_data(size):
     for i in range(size):
         x1 = random.randint(-2, 2)
         x2 = random.randint(-2, 2)
-        if x1 + x2 > 0:
+        if x1 * x1 > x2:
             Y.append(1)
         else:
             Y.append(0)
@@ -38,22 +38,10 @@ def L(a, y):
     return -(y*math.log(a) + (1-y)*math.log(1-a))
 
 # training function
-def train_vectorized(X, Y):
+def train(X, Y):
     global W, b
     batch_dW = np.array([0, 0])
     batch_db = 0
-    # iteration with index
-    # for i in range(len(X)):
-    #     z = np.dot(W, X[i]) + b
-    #     a = sigmoid(z)
-    #     da = -Y[i]/a + (1-Y[i])/(1-a)
-    #     dz = da * a * (1-a)
-    #     dW = X[i]*dz
-    #     db = dz
-    #     batch_dW = batch_dW + dW/len(X)
-    #     batch_db += db/len(X)
-    # W = W - alpha*batch_dW
-    # b -= alpha*batch_db
     for Xi, Yi in zip(X, Y):
         z = np.dot(W, Xi) + b
         a = sigmoid(z)
@@ -99,8 +87,8 @@ if __name__ == '__main__':
     train_X, train_Y = generate_random_data(m)
     test_X, test_Y = generate_random_data(n)
     for i in range(m):
-        train_vectorized(train_X, train_Y)
+        train(train_X, train_Y)
         # print("Iteration: "+ i.__str__())
     print('w1: {}, w2: {}, b: {}'.format(W[0], W[1], b))
-    print('train_vectorized loss: {}, accuracy: {}'.format(loss_with_vectorization(train_X, train_Y), accuracy_with_vectorization(train_X, train_Y)))
+    print('train loss: {}, accuracy: {}'.format(loss_with_vectorization(train_X, train_Y), accuracy_with_vectorization(train_X, train_Y)))
     print('test loss: {}, accuracy: {}'.format(loss_with_vectorization(test_X, test_Y), accuracy_with_vectorization(test_X, test_Y)))
