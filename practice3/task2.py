@@ -19,7 +19,7 @@ b1 = 0
 b2 = 0
 
 # data generator
-def generate_random_data(size):
+def generate_data(size):
     X = []
     Y = []
     for i in range(size):
@@ -41,7 +41,7 @@ def L(a, y):
     return -(y*math.log(a) + (1-y)*math.log(1-a))
 
 # training function
-def train_vectorized(X, Y):
+def train(X, Y):
     global W1, W2, b1, b2, m, n
     batch_dW1 = np.array([0, 0])
     batch_dW2 = 0
@@ -98,7 +98,7 @@ def forward(Xi):
     a2 = sigmoid(z2)
     return a2
 
-def accuracy_with_vectorization(X, Y):
+def accuracy(X, Y):
     num_correct = 0
     for i in range(len(X)):
         if Y[i] == round(forward(X[i])):
@@ -109,15 +109,15 @@ def print_vectorized_w_b():
     print('w1: {}, w2: {}, b: {}'.format(W1[0], W1[1], b))
 
 if __name__ == '__main__':
-    train_X, train_Y = generate_random_data(m)
-    test_X, test_Y = generate_random_data(n)
+    train_X, train_Y = generate_data(m)
+    test_X, test_Y = generate_data(n)
     start = time.time()
     for i in range(m):
-        train_vectorized(train_X, train_Y)
+        train(train_X, train_Y)
         # print("Iteration: "+ i.__str__())
     end = time.time()
     print('Time elapsed: ' + str(end - start) + 's')
     print('W1_1: {}, W1_2: {}, b1: {}'.format(W1[0], W1[1], b1))
     print('W2: {}, b2: {}'.format(W2, b2))
-    print('train accuracy: {}'.format(accuracy_with_vectorization(train_X, train_Y)))
-    print('test accuracy: {}'.format(accuracy_with_vectorization(test_X, test_Y)))
+    print('train accuracy: {}'.format(accuracy(train_X, train_Y)))
+    print('test accuracy: {}'.format(accuracy(test_X, test_Y)))
