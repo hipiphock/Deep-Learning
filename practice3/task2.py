@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import math
-from typing import List, Any
+import time
 
 # KEY: just do W[2]a[1] for one hidden layer,
 # INITAILIZATION
@@ -10,7 +10,7 @@ MIN_NUMBER = 1e-6
 m = 1000
 n = 100
 
-alpha = 0.03    # learning rate
+alpha = 0.028    # learning rate
 loss = 0        
 
 W1 = np.array([0, 0])
@@ -25,7 +25,7 @@ def generate_random_data(size):
     for i in range(size):
         x1 = random.randint(-2, 2)
         x2 = random.randint(-2, 2)
-        if x1 + x2 > 0:
+        if x1 * x1 > x2:
             Y.append(1)
         else:
             Y.append(0)
@@ -111,9 +111,13 @@ def print_vectorized_w_b():
 if __name__ == '__main__':
     train_X, train_Y = generate_random_data(m)
     test_X, test_Y = generate_random_data(n)
+    start = time.time()
     for i in range(m):
         train_vectorized(train_X, train_Y)
         # print("Iteration: "+ i.__str__())
-    print('W1_1: {}, W1_2: {}, W2: {}, b1: {}, b2: {}'.format(W1[0], W1[1], W2, b1, b2))
+    end = time.time()
+    print('Time elapsed: ' + str(end - start) + 's')
+    print('W1_1: {}, W1_2: {}, b1: {}'.format(W1[0], W1[1], b1))
+    print('W2: {}, b2: {}'.format(W2, b2))
     print('train accuracy: {}'.format(accuracy_with_vectorization(train_X, train_Y)))
     print('test accuracy: {}'.format(accuracy_with_vectorization(test_X, test_Y)))

@@ -2,6 +2,7 @@ import numpy as np
 import random
 import math
 from typing import List, Any
+import time
 
 # INITAILIZATION
 MIN_NUMBER = 1e-6
@@ -9,7 +10,7 @@ MIN_NUMBER = 1e-6
 m = 1000
 n = 100
 
-alpha = 0.002 # learning rate
+alpha = 0.003 # learning rate
 loss = 0
 
 W = np.array([0, 0])
@@ -63,7 +64,7 @@ def forward(Xi):
     a = min(a, 1 - MIN_VAL)
     return a
 
-def loss_with_vectorization(X, Y):
+def loss(X, Y):
     batch_loss = 0
     for i in range(len(X)):
         pred_y = forward(X[i])
@@ -71,7 +72,7 @@ def loss_with_vectorization(X, Y):
     batch_loss /= len(X)
     return batch_loss
 
-def accuracy_with_vectorization(X, Y):
+def accuracy(X, Y):
     num_correct = 0
     for i in range(len(X)):
         z = np.dot(W, X[i]) + b
@@ -86,9 +87,12 @@ def print_vectorized_w_b():
 if __name__ == '__main__':
     train_X, train_Y = generate_random_data(m)
     test_X, test_Y = generate_random_data(n)
+    start = time.time()
     for i in range(m):
         train(train_X, train_Y)
         # print("Iteration: "+ i.__str__())
+    end = time.time()
+    print('Time elapsed: ' + str(end - start) + 's')
     print('w1: {}, w2: {}, b: {}'.format(W[0], W[1], b))
-    print('train loss: {}, accuracy: {}'.format(loss_with_vectorization(train_X, train_Y), accuracy_with_vectorization(train_X, train_Y)))
-    print('test loss: {}, accuracy: {}'.format(loss_with_vectorization(test_X, test_Y), accuracy_with_vectorization(test_X, test_Y)))
+    print('train loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
+    print('test loss: {}, accuracy: {}'.format(loss(test_X, test_Y), accuracy(test_X, test_Y)))
