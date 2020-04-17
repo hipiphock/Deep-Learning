@@ -51,7 +51,7 @@ def train(X, Y):
         # need to find out dL/dW2, dL/dW1, dL/dB2. dL/dB1
         dL_dW2 = np.array(list(map(lambda x: x*(A2-Yi), A1)))
         dL_dB2 = (A2-Yi)*1
-        # TODO: need to handle A1(1-A1)
+        # A1_1_A1 = A1*(1-A1)
         A1_1_A1 = np.array(list(map(lambda x: x*(1-x), A1)))
         tmp_array = np.array(list(map(lambda x: x*(A2-Yi)*(Z2*(1-Z2)), A1_1_A1)))
         Xi_multiplied = np.array([Xi, Xi, Xi])
@@ -62,7 +62,7 @@ def train(X, Y):
         batch_dW2 = batch_dW2 + dL_dW2/TRAIN_NUM
         batch_dB1 = batch_dB1 + dL_dB1/TRAIN_NUM
         batch_dB2 = batch_dB2 + dL_dB2/TRAIN_NUM
-        
+
     W1 = W1 - alpha*batch_dW1
     W2 = W2 - alpha*batch_dW2
     B1 = B1 - alpha*batch_dB1
