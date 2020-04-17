@@ -12,7 +12,7 @@ import time
 TRAIN_NUM = 1000
 TEST_NUM = 100
 # initialize the variable
-W1 = np.array([0, 0], [0, 0], [0, 0])
+W1 = np.array([[0, 0], [0, 0], [0, 0]])
 W2 = np.array([0, 0, 0])
 B1 = np.array([0, 0, 0])
 B2 = 0
