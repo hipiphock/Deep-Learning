@@ -1,16 +1,13 @@
 # task3.py
 import numpy as np
 import random
-import math
 import time
 
 ## INITIALIZATION
-# 정의해야 할 것:
-# input x의 dimension
-# layer의 수,
-# 각 layer의 node의 수
 TRAIN_NUM = 1000
 TEST_NUM = 100
+alpha = 0.003   # learning rate
+
 # initialize the variable
 W1 = np.array([[0, 0], [0, 0], [0, 0]])
 W2 = np.array([0, 0, 0])
@@ -33,39 +30,60 @@ def generate_data(size):
 
 # Sigmoid function
 def sigmoid(val):
-    return 1/(1+math.exp(-val))
+    return 1/(1+np.exp(-val))
 
 def train(X, Y):
-    global W1, W2, B1, B2
-    dW1 = np.array([[0, 0], [0, 0], [0, 0]])
-    dW2 = np.array([0, 0, 0])
-    dB1 = np.array([0, 0, 0])
-    dB2 = 0
+    global W1, W2, B1, B2, alpha
+    batch_dW1 = np.array([[0, 0], [0, 0], [0, 0]])
+    batch_dW2 = np.array([0, 0, 0])
+    batch_dB1 = np.array([0, 0, 0])
+    batch_dB2 = 0
     # train each datum from train_data_X and train_data_Y
     for Xi, Yi in zip(X, Y):
         ### forwarding
         # for the first layer
         Z1 = np.dot(W1, Xi) + B1
-        A1 = list(map(sigmoid, Z1))
+        A1 = np.array(list(map(sigmoid, Z1)))
         # for the second layer
         Z2 = np.dot(W2, A1) + B2
         A2 = sigmoid(Z2)
         ### back propagation
         # need to find out dL/dW2, dL/dW1, dL/dB2. dL/dB1
-        dL_dW2 = list(map(lambda x: x*(A2-Yi), A1))
+        dL_dW2 = np.array(list(map(lambda x: x*(A2-Yi), A1)))
         dL_dB2 = (A2-Yi)*1
-        dL_dW1 = (A2-Yi)*(Z2*(1-Z2))*(A1*(1-A1))*(Xi)
-        dL_dB1 = (A2 - Yi) * (Z2*(1 - Z2)) * (A1*(1 - A1)) * (B1)
-        dW1 = dW1 + dL_dW1
-        dW2 = dW2 + dL_dW2
-        dB1 = dB1 + dL_dB1
-        dB2 = dB2 + dL_dB2
-    dW1 = dW1 / TRAIN_NUM
-    dW2 = dW2 / TRAIN_NUM
-    dB1 = dB1 / TRAIN_NUM
-    dB2 = dB2 / TRAIN_NUM
-    return dW1, dW2, dB1, dB2
-           
+        # TODO: need to handle A1(1-A1)
+        A1_1_A1 = np.array(list(map(lambda x: x*(1-x), A1)))
+        tmp_array = np.array(list(map(lambda x: x*(A2-Yi)*(Z2*(1-Z2)), A1_1_A1)))
+        Xi_multiplied = np.array([Xi, Xi, Xi])
+        dL_dW1 = np.dot(tmp_array, Xi_multiplied)
+        dL_dB1 = np.array(list(map(lambda x: x*(A2 - Yi) * (Z2*(1 - Z2)), A1_1_A1)))
+
+        batch_dW1 = batch_dW1 + dL_dW1/TRAIN_NUM
+        batch_dW2 = batch_dW2 + dL_dW2/TRAIN_NUM
+        batch_dB1 = batch_dB1 + dL_dB1/TRAIN_NUM
+        batch_dB2 = batch_dB2 + dL_dB2/TRAIN_NUM
+    W1 = W1 - alpha*batch_dW1
+    W2 = W2 - alpha*batch_dW2
+    B1 = B1 - alpha*batch_dB1
+    B2 = B2 - alpha*batch_dB2
+
+def forward(Xi):
+    ### forwarding
+    # for the first layer
+    Z1 = np.dot(W1, Xi) + B1
+    A1 = np.array(list(map(sigmoid, Z1)))
+    # for the second layer
+    Z2 = np.dot(W2, A1) + B2
+    A2 = sigmoid(Z2)
+    return A2
+
+def accuracy(X, Y):
+    num_correct = 0
+    for i in range(len(X)):
+        if Y[i] == round(forward(X[i])):
+            num_correct += 1
+    return num_correct/len(X)
+
 if __name__ == '__main__':
     train_X, train_Y = generate_data(TRAIN_NUM)
     test_X, test_Y = generate_data(TEST_NUM)
@@ -73,3 +91,10 @@ if __name__ == '__main__':
     for i in range(TRAIN_NUM):
         train(train_X, train_Y)
     end = time.time()
+    print('Time elapsed: ' + str(end - start) + 's')
+    print('W1: {}'.format(W1))
+    print('B1: {}'.format(B1))
+    print('W2: {}'.format(W2))
+    print('B2: {}'.format(B2))
+    print('train accuracy: {}'.format(accuracy(train_X, train_Y)))
+    print('test accuracy: {}'.format(accuracy(test_X, test_Y)))
