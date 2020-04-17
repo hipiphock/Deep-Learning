@@ -21,8 +21,8 @@ def generate_random_data(size):
     X = []
     Y = []
     for i in range(size):
-        x1 = random.randint(-2, 2)
-        x2 = random.randint(-2, 2)
+        x1 = random.uniform(-2, 2)
+        x2 = random.uniform(-2, 2)
         if x1 * x1 > x2:
             Y.append(1)
         else:
