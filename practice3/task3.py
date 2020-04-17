@@ -62,6 +62,7 @@ def train(X, Y):
         batch_dW2 = batch_dW2 + dL_dW2/TRAIN_NUM
         batch_dB1 = batch_dB1 + dL_dB1/TRAIN_NUM
         batch_dB2 = batch_dB2 + dL_dB2/TRAIN_NUM
+        
     W1 = W1 - alpha*batch_dW1
     W2 = W2 - alpha*batch_dW2
     B1 = B1 - alpha*batch_dB1
