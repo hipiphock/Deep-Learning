@@ -9,9 +9,9 @@ TEST_NUM = 100
 alpha = 0.003   # learning rate
 
 # initialize the variable
-W1 = np.array([[0, 0], [0, 0], [0, 0]])
-W2 = np.array([0, 0, 0])
-B1 = np.array([0, 0, 0])
+W1 = np.array([[0, 0], [0, 0], [0, 0]])     # 3*2 array
+W2 = np.array([0, 0, 0])                    # 3*1 array
+B1 = 0                                      # 3*1 array
 B2 = 0
 
 # generate random data
@@ -26,52 +26,46 @@ def generate_data(size):
         else:
             Y.append(0)
         X.append(np.array([x1, x2]))
-    return X, Y
+    return np.transpose(X), np.transpose(Y)
 
 # Sigmoid function
 def sigmoid(val):
     return 1/(1+np.exp(-val))
 
 def train(X, Y):
-    global W1, W2, B1, B2, alpha
-    batch_dW1 = np.array([[0, 0], [0, 0], [0, 0]])
-    batch_dW2 = np.array([0, 0, 0])
-    batch_dB1 = np.array([0, 0, 0])
-    batch_dB2 = 0
-    # train each datum from train_data_X and train_data_Y
-    for Xi, Yi in zip(X, Y):
-        ### forwarding
-        # for the first layer
-        Z1 = np.dot(W1, Xi) + B1
-        A1 = np.array(list(map(sigmoid, Z1)))
-        # for the second layer
-        Z2 = np.dot(W2, A1) + B2
-        A2 = sigmoid(Z2)
-        ### back propagation
-        # need to find out dL/dW2, dL/dW1, dL/dB2. dL/dB1
-        dL_dW2 = np.array(list(map(lambda x: x*(A2-Yi), A1)))
-        dL_dB2 = (A2-Yi)*1
-        # A1_1_A1 = A1*(1-A1)
-        A1_1_A1 = np.array(list(map(lambda x: x*(1-x), A1)))
-        tmp_array = np.array(list(map(lambda x: x*(A2-Yi)*(Z2*(1-Z2)), A1_1_A1)))
-        Xi_multiplied = np.array([Xi, Xi, Xi])
-        dL_dW1 = np.dot(tmp_array, Xi_multiplied)
-        dL_dB1 = np.array(list(map(lambda x: x*(A2 - Yi) * (Z2*(1 - Z2)), A1_1_A1)))
+    global W1, W2, B1, B2, alpha, TRAIN_NUM, TEST_NUM
+    # forwarding: layer 1
+    Z1 = np.dot(W1, X) + B1
+    A1 = sigmoid(Z1)
+    # forwarding: layer 2
+    Z2 = np.dot(np.transpose(W2), A1) + B2
+    A2 = sigmoid(Z2)
+    # back propagation: dW2
+    dZ2 = A2 - Y                    # dL/dZ2
+    dW2 = np.dot(A1, np.transpose(Z2))/TRAIN_NUM
+    # back propagation: dB2
+    dB2 = np.sum(dZ2)/TRAIN_NUM     
+    # back propagation: dW1 - TODO
+    # dZ2/dA1=W2, dA1/dZ1=A1(1-A1)
+    print(np.shape(dZ2))
+    print(np.shape(W2))
+    print(np.shape(A1*(1-A1)))
+    # dW1 = dZ2*W2*A1*(1-A1)   # (1000*1)*(1*3)*(3*1000)?
+    tmp_arr = W2*np.dot(dZ2, np.transpose(A1*(1-A1)))
+    # dW1 = np.dot(X, np.transpose(dZ2*W2*A1_1_A1))/TRAIN_NUM
+    dW1 = np.dot(tmp_arr, np.transpose(X))/TRAIN_NUM
+    # back propagation: dB1
+    dB1 = dZ2*W2*A1*(1-A1)*(1-Z2)/TRAIN_NUM
 
-        batch_dW1 = batch_dW1 + dL_dW1/TRAIN_NUM
-        batch_dW2 = batch_dW2 + dL_dW2/TRAIN_NUM
-        batch_dB1 = batch_dB1 + dL_dB1/TRAIN_NUM
-        batch_dB2 = batch_dB2 + dL_dB2/TRAIN_NUM
-
-    W1 = W1 - alpha*batch_dW1
-    W2 = W2 - alpha*batch_dW2
-    B1 = B1 - alpha*batch_dB1
-    B2 = B2 - alpha*batch_dB2
+    W1 = W1 - alpha*np.transpose(dW1)
+    W2 = W2 - alpha*dW2
+    B1 = B1 - alpha*dB1
+    B2 = B2 - alpha*dB2
 
 def forward(Xi):
     ### forwarding
     # for the first layer
-    Z1 = np.dot(W1, Xi) + B1
+    Z1 = np.dot(np.transpose(W1), X) + B1
     A1 = np.array(list(map(sigmoid, Z1)))
     # for the second layer
     Z2 = np.dot(W2, A1) + B2
@@ -80,10 +74,16 @@ def forward(Xi):
 
 def accuracy(X, Y):
     num_correct = 0
-    for i in range(len(X)):
-        if Y[i] == round(forward(X[i])):
+    # forwarding: layer 1
+    Z1 = np.dot(W1, X) + B1
+    A1 = sigmoid(Z1)
+    # forwarding: layer 2
+    Z2 = np.dot(np.transpose(W2), A1) + B2
+    A2 = sigmoid(Z2)
+    for Ai, Yi in zip(A2, Y):
+        if round(Ai) == Yi:
             num_correct += 1
-    return num_correct/len(X)
+    return num_correct/len(np.transpose(X))
 
 if __name__ == '__main__':
     train_X, train_Y = generate_data(TRAIN_NUM)

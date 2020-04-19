@@ -1,21 +1,20 @@
+# task3.py
 import numpy as np
 import random
-from typing import List, Any
 import time
 
-# INITAILIZATION
-MIN_NUMBER = 1e-6
-
+## INITIALIZATION
 TRAIN_NUM = 1000
 TEST_NUM = 100
+alpha = 0.003   # learning rate
 
-alpha = 0.003 # learning rate
-loss = 0
+# initialize the variable
+W1 = np.array([[0, 0], [0, 0], [0, 0]])
+W2 = np.array([0, 0, 0])
+B1 = np.array([0, 0, 0])
+B2 = 0
 
-W = np.array([0, 0])
-b = 0
-
-# data generator
+# generate random data
 def generate_data(size):
     X = []
     Y = []
@@ -27,60 +26,64 @@ def generate_data(size):
         else:
             Y.append(0)
         X.append(np.array([x1, x2]))
-    return np.transpose(X), np.transpose(Y)
+    return X, Y
 
 # Sigmoid function
 def sigmoid(val):
     return 1/(1+np.exp(-val))
 
-# Loss function for Logistic Regression
-def L(a, y):
-    return -(y*np.log(a) + (1-y)*np.log(1-a))
-
-# training function
-# X is 2*1000 array
-# Y is 1*1000 array
 def train(X, Y):
-    global W, b
-    # forwarding
-    Z = np.dot(np.transpose(W), X) + b
-    A = sigmoid(Z)
-    # back propagation
-    dZ = A - Y
-    dW = np.dot(X, np.transpose(dZ))/TRAIN_NUM
-    db = np.sum(dZ)/TRAIN_NUM
-    W = W - alpha*dW
-    b -= alpha*db
+    global W1, W2, B1, B2, alpha
+    batch_dW1 = np.array([[0, 0], [0, 0], [0, 0]])
+    batch_dW2 = np.array([0, 0, 0])
+    batch_dB1 = np.array([0, 0, 0])
+    batch_dB2 = 0
+    # train each datum from train_data_X and train_data_Y
+    for Xi, Yi in zip(X, Y):
+        ### forwarding
+        # for the first layer
+        Z1 = np.dot(W1, Xi) + B1
+        A1 = np.array(list(map(sigmoid, Z1)))
+        # for the second layer
+        Z2 = np.dot(W2, A1) + B2
+        A2 = sigmoid(Z2)
+        ### back propagation
+        # need to find out dL/dW2, dL/dW1, dL/dB2. dL/dB1
+        dL_dW2 = np.array(list(map(lambda x: x*(A2-Yi), A1)))
+        dL_dB2 = (A2-Yi)*1
+        # A1_1_A1 = A1*(1-A1)
+        A1_1_A1 = np.array(list(map(lambda x: x*(1-x), A1)))
+        tmp_array = np.array(list(map(lambda x: x*(A2-Yi)*(Z2*(1-Z2)), A1_1_A1)))
+        Xi_multiplied = np.array([Xi, Xi, Xi])
+        dL_dW1 = np.dot(tmp_array, Xi_multiplied)
+        dL_dB1 = np.array(list(map(lambda x: x*(A2 - Yi) * (Z2*(1 - Z2)), A1_1_A1)))
+
+        batch_dW1 = batch_dW1 + dL_dW1/TRAIN_NUM
+        batch_dW2 = batch_dW2 + dL_dW2/TRAIN_NUM
+        batch_dB1 = batch_dB1 + dL_dB1/TRAIN_NUM
+        batch_dB2 = batch_dB2 + dL_dB2/TRAIN_NUM
+
+    W1 = W1 - alpha*batch_dW1
+    W2 = W2 - alpha*batch_dW2
+    B1 = B1 - alpha*batch_dB1
+    B2 = B2 - alpha*batch_dB2
 
 def forward(Xi):
-    global W, b
-    z = np.dot(np.transpose(W), Xi) + b
-    a = sigmoid(z)
-    MIN_VAL = 1e-10
-    a = max(a, MIN_VAL)
-    a = min(a, 1 - MIN_VAL)
-    return a
-
-def loss(X, Y):
-    batch_loss = 0
-    # for i in range(len(X)):
-    #     pred_y = forward(X[i])
-    #     batch_loss -= Y[i] * math.log(pred_y) + (1 - Y[i]) * math.log(1 - pred_y)
-    # batch_loss /= len(X)
-    Z = np.dot(np.transpose(W), X) + b
-    A = sigmoid(Z)
-    B_L = -(Y*np.log(A) + (1-Y)*np.log(1-A))
-    batch_loss = np.sum(B_L)/TRAIN_NUM
-    return batch_loss
+    ### forwarding
+    # for the first layer
+    Z1 = np.dot(W1, Xi) + B1
+    A1 = np.array(list(map(sigmoid, Z1)))
+    # for the second layer
+    Z2 = np.dot(W2, A1) + B2
+    A2 = sigmoid(Z2)
+    return A2
 
 def accuracy(X, Y):
     num_correct = 0
-    Z = np.dot(np.transpose(W), X) + b
-    A = sigmoid(Z)
-    for Ai, Yi in zip(A, Y):
-        if round(Ai) == Yi:
+    for i in range(len(X)):
+        if Y[i] == round(forward(X[i])):
             num_correct += 1
-    return num_correct/len(np.transpose(X))
+    return num_correct/len(X)
 
 if __name__ == '__main__':
     train_X, train_Y = generate_data(TRAIN_NUM)
@@ -90,6 +93,9 @@ if __name__ == '__main__':
         train(train_X, train_Y)
     end = time.time()
     print('Time elapsed: ' + str(end - start) + 's')
-    print('w1: {}, w2: {}, b: {}'.format(W[0], W[1], b))
-    print('train loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
-    print('test loss: {}, accuracy: {}'.format(loss(test_X, test_Y), accuracy(test_X, test_Y)))
+    print('W1: {}'.format(W1))
+    print('B1: {}'.format(B1))
+    print('W2: {}'.format(W2))
+    print('B2: {}'.format(B2))
+    print('train accuracy: {}'.format(accuracy(train_X, train_Y)))
+    print('test accuracy: {}'.format(accuracy(test_X, test_Y)))
