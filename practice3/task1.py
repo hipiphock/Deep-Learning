@@ -9,7 +9,7 @@ MIN_NUMBER = 1e-6
 TRAIN_NUM = 1000
 TEST_NUM = 100
 
-alpha = 0.003 # learning rate
+alpha = 0.005 # learning rate
 loss = 0
 
 W = np.array([0, 0])
@@ -49,17 +49,9 @@ def train(X, Y):
     dZ = A - Y
     dW = np.dot(X, np.transpose(dZ))/TRAIN_NUM
     db = np.sum(dZ)/TRAIN_NUM
+    
     W = W - alpha*dW
     b -= alpha*db
-
-def forward(Xi):
-    global W, b
-    z = np.dot(np.transpose(W), Xi) + b
-    a = sigmoid(z)
-    MIN_VAL = 1e-10
-    a = max(a, MIN_VAL)
-    a = min(a, 1 - MIN_VAL)
-    return a
 
 def loss(X, Y):
     batch_loss = 0
