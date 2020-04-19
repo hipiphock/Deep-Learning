@@ -1,14 +1,13 @@
 import numpy as np
 import random
-import math
 from typing import List, Any
 import time
 
 # INITAILIZATION
 MIN_NUMBER = 1e-6
 
-m = 1000
-n = 100
+TRAIN_NUM = 1000
+TEST_NUM = 100
 
 alpha = 0.003 # learning rate
 loss = 0
@@ -17,7 +16,7 @@ W = np.array([0, 0])
 b = 0
 
 # data generator
-def generate_random_data(size):
+def generate_data(size):
     X = []
     Y = []
     for i in range(size):
@@ -28,36 +27,34 @@ def generate_random_data(size):
         else:
             Y.append(0)
         X.append(np.array([x1, x2]))
-    return X, Y
+    return np.transpose(X), np.transpose(Y)
 
 # Sigmoid function
 def sigmoid(val):
-    return 1/(1+math.exp(-val))
+    return 1/(1+np.exp(-val))
 
 # Loss function for Logistic Regression
 def L(a, y):
-    return -(y*math.log(a) + (1-y)*math.log(1-a))
+    return -(y*np.log(a) + (1-y)*np.log(1-a))
 
 # training function
+# X is 2*1000 array
+# Y is 1*1000 array
 def train(X, Y):
     global W, b
-    batch_dW = np.array([0, 0])
-    batch_db = 0
-    for Xi, Yi in zip(X, Y):
-        z = np.dot(W, Xi) + b
-        a = sigmoid(z)
-        da = -Yi/a + (1-Yi)/(1-a)
-        dz = da * a * (1-a)
-        dW = Xi*dz
-        db = dz
-        batch_dW = batch_dW + dW/len(X)
-        batch_db += db/len(X)
-    W = W - alpha*batch_dW
-    b -= alpha*batch_db
+    # forwarding
+    Z = np.dot(np.transpose(W), X) + b
+    A = sigmoid(Z)
+    # back propagation
+    dZ = A - Y
+    dW = np.dot(X, np.transpose(dZ))/TRAIN_NUM
+    db = np.sum(dZ)/TRAIN_NUM
+    W = W - alpha*dW
+    b -= alpha*db
 
 def forward(Xi):
     global W, b
-    z = np.dot(W, Xi) + b
+    z = np.dot(np.transpose(W), Xi) + b
     a = sigmoid(z)
     MIN_VAL = 1e-10
     a = max(a, MIN_VAL)
@@ -66,31 +63,27 @@ def forward(Xi):
 
 def loss(X, Y):
     batch_loss = 0
-    for i in range(len(X)):
-        pred_y = forward(X[i])
-        batch_loss -= Y[i] * math.log(pred_y) + (1 - Y[i]) * math.log(1 - pred_y)
-    batch_loss /= len(X)
+    Z = np.dot(np.transpose(W), X) + b
+    A = sigmoid(Z)
+    B_L = -(Y*np.log(A) + (1-Y)*np.log(1-A))
+    batch_loss = np.sum(B_L)/TRAIN_NUM
     return batch_loss
 
 def accuracy(X, Y):
     num_correct = 0
-    for i in range(len(X)):
-        z = np.dot(W, X[i]) + b
-        a = sigmoid(z)
-        if Y[i] == round(forward(X[i])):
+    Z = np.dot(np.transpose(W), X) + b
+    A = sigmoid(Z)
+    for Ai, Yi in zip(A, Y):
+        if round(Ai) == Yi:
             num_correct += 1
-    return num_correct/len(X)
-
-def print_vectorized_w_b():
-    print('w1: {}, w2: {}, b: {}'.format(W[0], W[1], b))
+    return num_correct/len(np.transpose(X))
 
 if __name__ == '__main__':
-    train_X, train_Y = generate_random_data(m)
-    test_X, test_Y = generate_random_data(n)
+    train_X, train_Y = generate_data(TRAIN_NUM)
+    test_X, test_Y = generate_data(TEST_NUM)
     start = time.time()
-    for i in range(m):
+    for i in range(TRAIN_NUM):
         train(train_X, train_Y)
-        # print("Iteration: "+ i.__str__())
     end = time.time()
     print('Time elapsed: ' + str(end - start) + 's')
     print('w1: {}, w2: {}, b: {}'.format(W[0], W[1], b))
