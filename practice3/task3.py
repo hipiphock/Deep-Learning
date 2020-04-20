@@ -6,7 +6,7 @@ import time
 ## INITIALIZATION
 TRAIN_NUM = 1000
 TEST_NUM = 100
-alpha = 0.0001   # learning rate
+alpha = 1   # learning rate
 
 # initialize the variable
 W1 = np.random.randn(3,2)
@@ -88,10 +88,10 @@ def find_best_alpha(X, Y):
     global alpha
     # Using Ternary Search
     head = 0
-    tail = 0.762231
+    tail = 1.0
     cnt = 0
     best_alpha = 0.001
-    while tail - head > 1e-6:
+    while tail - head > 1e-8:
         p = (2 * head + tail) / 3
         q = (head + 2 * tail) / 3
         alpha = p
@@ -101,7 +101,7 @@ def find_best_alpha(X, Y):
         train(X, Y)
         q_loss = loss(X, Y)
         cnt += 1
-        print('%d Search: [%.6f, %.6f, %.6f, %.6f] => loss_p: %.6f, loss_q: %.6f' % (cnt, head, p, q, tail, p_loss, q_loss))
+        # print('%d Search: [%.6f, %.6f, %.6f, %.6f] => loss_p: %.6f, loss_q: %.6f' % (cnt, head, p, q, tail, p_loss, q_loss))/
         if p_loss > q_loss:
             head = p
             best_alpha = q
@@ -115,7 +115,7 @@ if __name__ == '__main__':
     train_X, train_Y = generate_data(TRAIN_NUM)
     test_X, test_Y = generate_data(TEST_NUM)
     start = time.time()
-    find_best_alpha(train_X, train_Y)
+    # find_best_alpha(train_X, train_Y)
     for i in range(TRAIN_NUM):
         train(train_X, train_Y)
     end = time.time()

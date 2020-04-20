@@ -70,9 +70,37 @@ def accuracy(X, Y):
             num_correct += 1
     return num_correct/len(np.transpose(X))
 
+def find_best_alpha(X, Y):
+    global alpha
+    # Using Ternary Search
+    head = 0
+    tail = 1.0
+    cnt = 0
+    best_alpha = 0.001
+    while tail - head > 1e-8:
+        p = (2 * head + tail) / 3
+        q = (head + 2 * tail) / 3
+        alpha = p
+        train(X, Y)
+        p_loss = loss(X, Y)
+        alpha = q
+        train(X, Y)
+        q_loss = loss(X, Y)
+        cnt += 1
+        # print('%d Search: [%.6f, %.6f, %.6f, %.6f] => loss_p: %.6f, loss_q: %.6f' % (cnt, head, p, q, tail, p_loss, q_loss))/
+        if p_loss > q_loss:
+            head = p
+            best_alpha = q
+        elif p_loss <= q_loss:
+            tail = q
+            best_alpha = p
+    print('Best Learning Rate: %.6f' % best_alpha)
+    alpha = best_alpha
+
 if __name__ == '__main__':
     train_X, train_Y = generate_data(TRAIN_NUM)
     test_X, test_Y = generate_data(TEST_NUM)
+    find_best_alpha(train_X, train_Y)
     start = time.time()
     for i in range(TRAIN_NUM):
         train(train_X, train_Y)
