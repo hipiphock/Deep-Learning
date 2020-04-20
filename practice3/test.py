@@ -53,7 +53,7 @@ def train(X, Y):
         dL_dB2 = (A2-Yi)*1
         # A1_1_A1 = A1*(1-A1)
         A1_1_A1 = np.array(list(map(lambda x: x*(1-x), A1)))
-        tmp_array = np.array(list(map(lambda x: x*(A2-Yi)*(Z2*(1-Z2)), A1_1_A1)))
+        tmp_array = np.array(list(map(lambda x: x*(A2-Yi)*W2, A1_1_A1)))
         Xi_multiplied = np.array([Xi, Xi, Xi])
         dL_dW1 = np.dot(tmp_array, Xi_multiplied)
         dL_dB1 = np.array(list(map(lambda x: x*(A2 - Yi) * (Z2*(1 - Z2)), A1_1_A1)))

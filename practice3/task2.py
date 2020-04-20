@@ -14,8 +14,8 @@ loss = 0
 
 W1 = np.array([0, 0])
 W2 = 0
-B1 = 0
-B2 = 0
+b1 = 0
+b2 = 0
 
 # data generator
 def generate_data(size):
@@ -41,12 +41,12 @@ def L(a, y):
 
 # training function
 def train(X, Y):
-    global W1, W2, B1, B2, TRAIN_NUM, TEST_NUM
+    global W1, W2, b1, b2, TRAIN_NUM, TEST_NUM
     # layer 1, Z1 is vector, A1 is number
-    Z1 = np.dot(np.transpose(W1), X) + B1
+    Z1 = np.dot(np.transpose(W1), X) + b1
     A1 = sigmoid(Z1)
     # layer 2, Z2 is number, A2 is number
-    Z2 = W2*A1 + B2
+    Z2 = W2*A1 + b2
     A2 = sigmoid(Z2)
     # dL/dW2
     dZ2 = A2 - Y
@@ -62,16 +62,16 @@ def train(X, Y):
 
     W1 = W1 - alpha*dW1
     W2 = W2 - alpha*dW2
-    B1 = B1 - alpha*dB1
-    B2 = B2 - alpha*dB2
+    b1 = b1 - alpha*dB1
+    b2 = b2 - alpha*dB2
 
 
 def loss(X, Y):
-    global W1, W2, B1, B2, TRAIN_NUM, TEST_NUM
+    global W1, W2, b1, b2, TRAIN_NUM, TEST_NUM
     batch_loss = 0
-    Z1 = np.dot(np.transpose(W1), X) + B1
+    Z1 = np.dot(np.transpose(W1), X) + b1
     A1 = sigmoid(Z1)
-    Z2 = W2*A1 + B2
+    Z2 = W2*A1 + b2
     A2 = sigmoid(Z2)
     B_L = -(Y*np.log(A2) + (1-Y)*np.log(1-A2))
     batch_loss = np.sum(B_L)/TRAIN_NUM
@@ -79,9 +79,9 @@ def loss(X, Y):
 
 def accuracy(X, Y):
     num_correct = 0
-    Z1 = np.dot(np.transpose(W1), X) + B1
+    Z1 = np.dot(np.transpose(W1), X) + b1
     A1 = sigmoid(Z1)
-    Z2 = W2*A1 + B2
+    Z2 = W2*A1 + b2
     A2 = sigmoid(Z2)
     for Ai, Yi in zip(A2, Y):
         if round(Ai) == Yi:
@@ -96,7 +96,7 @@ if __name__ == '__main__':
         train(train_X, train_Y)
     end = time.time()
     print('Time elapsed: ' + str(end - start) + 's')
-    print('W1: {}, b1: {}'.format(W1, B1))
-    print('W2: {}, b2: {}'.format(W2, B2))
+    print('W1: {}, b1: {}'.format(W1, b1))
+    print('W2: {}, b2: {}'.format(W2, b2))
     print('train accuracy: {}'.format(accuracy(train_X, train_Y)))
     print('test accuracy: {}'.format(accuracy(test_X, test_Y)))
