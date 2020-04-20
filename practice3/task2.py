@@ -98,5 +98,5 @@ if __name__ == '__main__':
     print('Time elapsed: ' + str(end - start) + 's')
     print('W1: {}, b1: {}'.format(W1, b1))
     print('W2: {}, b2: {}'.format(W2, b2))
-    print('train accuracy: {}'.format(accuracy(train_X, train_Y)))
-    print('test accuracy: {}'.format(accuracy(test_X, test_Y)))
+    print('train loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
+    print('test loss: {}, accuracy: {}'.format(loss(test_X, test_Y), accuracy(test_X, test_Y)))

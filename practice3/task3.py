@@ -9,13 +9,16 @@ TEST_NUM = 100
 alpha = 0.003   # learning rate
 
 # initialize the variable
-W1 = np.zeros((3,2))
-b1 = np.zeros((3,1))
-W2 = np.zeros((1,3))
-b2 = np.zeros((1,1))
+W1 = np.random.randn(3,2)
+b1 = np.random.randn(3,1)
+W2 = np.random.randn(1,3)
+b2 = np.random.randn(1,1)
+# W1 = np.zeros((3,2))
+# b1 = np.zeros((3,1))
+# W2 = np.zeros((1,3))
+# b2 = np.zeros((1,1))
 
 # generate random data
-# X, Y are ()*1000
 def generate_data(size):
     X = []
     Y = []
@@ -57,29 +60,53 @@ def train(X, Y):
     b1 = b1 - alpha*dB1
     b2 = b2 - alpha*dB2
 
-
 def forward(X):
-    ### forwarding
-    # for the first layer
-    Z1 = np.dot(np.transpose(W1), X) + b1
-    A1 = np.array(list(map(sigmoid, Z1)))
-    # for the second layer
-    Z2 = np.dot(W2, A1) + b2
-    A2 = sigmoid(Z2)
-    return A2
-
-def accuracy(X, Y):
-    num_correct = 0
     # forwarding: layer 1
     Z1 = np.dot(W1, X) + b1
     A1 = sigmoid(Z1)
     # forwarding: layer 2
     Z2 = np.dot(W2, A1) + b2
     A2 = sigmoid(Z2)
+    return A2
+
+def loss(X, Y):
+    loss = 0
+    A2 = forward(X)
+    L = -(Y*np.log(A2) + (1-Y)*np.log(1-A2))
+    loss = np.sum(L) / len(Y)
+    return loss
+
+def accuracy(X, Y):
+    num_correct = 0
+    A2 = forward(X)
     A2[A2 > 0.5] = 1
     A2[A2 <= 0.5] = 0
     num_correct = np.sum(A2 == Y)
     return num_correct/len(np.transpose(X))
+
+def find_best_alpha(X, Y):
+    # Using Ternary Search
+    head = 0
+    tail = 50.0
+    cnt = 0
+    best_alpha = 0.001
+    while tail - head > 1e-6:
+        p = (2 * head + tail) / 3
+        q = (head + 2 * tail) / 3
+        alpha = p
+        p_loss = loss(X, Y)
+        alpha = q
+        q_loss = loss(X, Y)
+        cnt += 1
+        print('%d Search: [%.6f, %.6f, %.6f, %.6f] => loss_p: %.6f, loss_q: %.6f' % (cnt, head, p, q, tail, p_loss, q_loss))
+        if p_loss > q_loss:
+            head = p
+            best_alpha = q
+        elif p_loss <= q_loss:
+            tail = q
+            best_alpha = p
+    print('Best Learning Rate: %.6f' % best_alpha)
+    alpha = best_alpha
 
 if __name__ == '__main__':
     train_X, train_Y = generate_data(TRAIN_NUM)
@@ -93,5 +120,6 @@ if __name__ == '__main__':
     print('B1: {}'.format(b1))
     print('W2: {}'.format(W2))
     print('B2: {}'.format(b2))
-    print('train accuracy: {}'.format(accuracy(train_X, train_Y)))
-    print('test accuracy: {}'.format(accuracy(test_X, test_Y)))
+    find_best_alpha(train_X, train_Y)
+    print('train loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
+    print('test loss: {}, accuracy: {}'.format(loss(test_X, test_Y), accuracy(test_X, test_Y)))
