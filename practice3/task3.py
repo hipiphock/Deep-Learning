@@ -6,7 +6,7 @@ import time
 ## INITIALIZATION
 TRAIN_NUM = 1000
 TEST_NUM = 100
-alpha = 1   # learning rate
+alpha = 2.0   # learning rate
 
 # initialize the variable
 W1 = np.random.randn(3,2)
@@ -125,4 +125,7 @@ if __name__ == '__main__':
     print('W2: {}'.format(W2))
     print('B2: {}'.format(b2))
     print('train loss: {}, accuracy: {}'.format(loss(train_X, train_Y), accuracy(train_X, train_Y)))
+    test_start = time.time()
     print('test loss: {}, accuracy: {}'.format(loss(test_X, test_Y), accuracy(test_X, test_Y)))
+    test_end = time.time()
+    print('Test time elapsed: ' + str(test_end - test_start) + 's')
