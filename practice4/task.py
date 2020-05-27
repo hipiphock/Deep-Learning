@@ -14,7 +14,6 @@ def generate_data(size):
     return np.array(X), np.array(Y)
     
 if __name__ == '__main__':
-    # tf.random.uniform([1000, 2], -2, maxval=2, dtype=tf.dtypes.int32)
     train_x, train_y = generate_data(1000)
     test_x, test_y = generate_data(100)
 
@@ -25,12 +24,23 @@ if __name__ == '__main__':
     ])
 
     model.compile(
+        # for table 1: use SGD optimizor
+        # optimizer=tf.keras.optimizers.SGD(0.5),
+
+        # for table 2: compare optimizers
+        # optimizer=tf.keras.optimizers.SGD(0.5),
+        # optimizer=tf.keras.optimizers.RMSprop(0.5),
         optimizer=tf.keras.optimizers.Adam(0.5),
+
+        # for table 1: compare loss functions
         loss=tf.keras.losses.binary_crossentropy,
+        # loss=tf.keras.losses.mean_squared_error,
+                                                    
         metrics=[tf.keras.metrics.binary_accuracy]
     )
 
     train_start = time.time()
+    # for table 4: batch size
     result = model.fit(train_x, train_y, batch_size=1000, epochs=1000, verbose=0)
     train_loss = result.history['loss'][-1]
     train_accuracy = result.history['binary_accuracy'][-1]
@@ -44,8 +54,8 @@ if __name__ == '__main__':
 
     print('Train time: ' + str(train_end - train_start) + 's')
     print("Train loss: {}".format(train_loss))
-    print("Train accuracy: {}".format(train_accuracy))
+    print("Train accuracy: {}".format(train_accuracy*100))
 
     print('Test time: ' + str(test_end - test_start) + 's')
     print("Test loss: {}".format(test_loss))
-    print("Test accuracy: {}".format(test_accuracy))
+    print("Test accuracy: {}".format(test_accuracy*100))
