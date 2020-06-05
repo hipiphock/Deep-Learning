@@ -30,7 +30,10 @@ if __name__ == '__main__':
         # for table 2: compare optimizers
         # optimizer=tf.keras.optimizers.SGD(0.5),
         # optimizer=tf.keras.optimizers.RMSprop(0.5),
-        optimizer=tf.keras.optimizers.Adam(0.5),
+        # optimizer=tf.keras.optimizers.Adam(0.5),
+
+        # for table 3: use SGD since in practice 3, we used SGD
+        optimizer=tf.keras.optimizers.SGD(0.5),
 
         # for table 1: compare loss functions
         loss=tf.keras.losses.binary_crossentropy,
