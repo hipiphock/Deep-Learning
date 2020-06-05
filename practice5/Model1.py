@@ -31,10 +31,8 @@ if __name__ == '__main__':
 
     _, acc = model.evaluate(x_test, y_test, verbose=0)
 
+    # image test
     img_path = 'noisy.png'
-    img = keras.preprocessing.image.load_img(img_path, target_size=(64, 64))
-    matplotlib.pyplot.imshow(img)
-
-    x = keras.preprocessing.image.img_to_array(img)
-    x = np.expand_dims(x, axis=0)
-    x = keras.applications.imagenet_utils.preprocess_input(x)
+    img = keras.preprocessing.image.load_img(img_path)
+    img = keras.preprocessing.image.img_to_array(img)
+    
