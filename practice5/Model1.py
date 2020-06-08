@@ -1,6 +1,4 @@
 # Model1.py
-# from __future__ import absolute_import, division, print_function, unicode_literals
-# !pip3 install -q tensorflow-gpu==2.0.0-rc1
 import os
 import tensorflow as tf
 from tensorflow.keras.preprocessing import image
