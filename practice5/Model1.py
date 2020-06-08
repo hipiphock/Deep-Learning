@@ -21,7 +21,7 @@ def construct_model():
     return model
 
 if __name__ == '__main__':
-    # image test
+    # image
     drive.mount('DeepLearning/', force_remount=True)
     root_dir = "DeepLearning/"
     img = image.load_img('noisy.png')
